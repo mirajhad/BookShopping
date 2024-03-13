@@ -1,0 +1,54 @@
+﻿@page "/edit/user/{UserId}"
+@inject IAccountsRepository _accountRepo
+@inject IUtilityService _utility
+@attribute [Authorize(Roles = "Admin")]
+<h3>Edit User</h3>
+<div class="form-inline">
+    <select class="form-control" @bind="selectedRole">
+        <option value="0"> Select Role </option>
+        @foreach (var role in Roles)
+        {
+            <option value="@role.RoleName">@role.RoleName</option>
+        }
+    </select>
+    <button class="btn btn-primary" @onclick="AssignRole">Assign Role</button>
+    <button class="btn btn-primary" @onclick="RemoveRole">Remove Role</button>
+</div>
+@code {
+    [Parameter]
+    public string UserId{ get; set; }
+    private string selectedRole = "0";
+    private  List<RoleDTO> Roles = new List<RoleDTO>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Roles = await _accountRepo.GetAllRoles();
+    }
+
+    private async Task AssignRole()
+    {
+        if(selectedRole=="0")
+        {
+            await _utility.ShowErrorMessage("Please Select Any one role");
+            return;
+        }
+        await _accountRepo.AddRole(new UserRoleDTO() { RoleName = selectedRole, UserId = UserId });
+        await _utility.ShowSuccessMessage("Role Assigned");
+
+
+    }
+
+    private async Task RemoveRole()
+    {
+        if (selectedRole == "0")
+        {
+            await _utility.ShowErrorMessage("Please Select Any one role");
+            return;
+        }
+        await _accountRepo.DeleteRole(new UserRoleDTO() { RoleName = selectedRole, UserId = UserId });
+        await _utility.ShowSuccessMessage("Role Removed");
+
+
+    }
+
+}

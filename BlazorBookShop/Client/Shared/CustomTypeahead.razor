@@ -1,0 +1,152 @@
+﻿@using System.Timers
+@typeparam T
+<div>
+<div class="Custom_Typeahead">
+    <input class="Custom_Typeahead_textbox" type="text" autocomplete="off" placeholder="Search Author"        
+        @onclick="@showDataList" @onfocusout="hideDataList" @bind-value="@SearchText" @bind-value:event="oninput"/>     
+     </div>
+     @if(isSearching)
+     {
+        <div class="custom_typahead_outputs">
+            <div class="custom_typeahead_output">
+        <span>Loading...</span>
+        </div>
+        </div>
+     
+    }
+    else if(DisplayDataList())
+    {
+        <div class="custom_typahead_outputs">
+            @foreach (var item in DataList)
+            {
+                <div @key="item" class="custom_typeahead_output" @onclick="@(()=> SelectedItem(item))"
+                    @onmouseover="OnmouseOverDataList" @onmouseout="OnmouseOutDataList"       
+                    >
+                    @ResultTemplate(item)
+                    </div>
+            }
+
+        </div>
+    }
+    else if(DataNotFound())
+    {
+        @if(NotFoundTemplate!=null)
+        {
+            <div>
+                @NotFoundTemplate
+            </div>
+        }
+        else
+        {
+            <div>
+                Data Not Found
+                </div>
+        }
+
+    }
+</div>
+
+@code {
+    [Parameter] public RenderFragment<T> ResultTemplate{ get; set; }
+    [Parameter] public RenderFragment NotFoundTemplate{ get; set; }
+    [Parameter] public int MinLength { get; set; } = 3;
+    [Parameter] public EventCallback<T> SendValue{ get; set; }
+
+
+    public T[] DataList { get; set; } = new T[0];
+    [Parameter] public int Debounce { get; set; } = 500;
+    private bool IsShowingDataList = false;
+    private string _SearchingText = string.Empty;
+    private Timer _timer;
+    private bool isSearching = false;
+
+    [Parameter] public Func<string,Task<IEnumerable<T>>> Result{ get; set; }
+
+    bool IsMouseinDataList = false;
+
+    private void OnmouseOverDataList()
+    {
+        IsMouseinDataList = true;
+    }
+    private void  OnmouseOutDataList()
+    {
+        IsMouseinDataList = false;
+    }
+
+
+    private async Task SelectedItem(T Item)
+    {
+        SearchText = "";
+        await SendValue.InvokeAsync(Item);
+    }
+
+    protected override void OnInitialized()
+    {
+        _timer = new Timer();
+        _timer.Interval = Debounce;
+        _timer.AutoReset = false;
+        _timer.Elapsed += Search;
+        base.OnInitialized();
+    }
+
+    private bool DataNotFound()
+    {
+        return !DataList.Any() && IsShowingDataList;
+    }
+
+    protected async void Search(Object source,ElapsedEventArgs e)
+    {
+        isSearching = true;
+        IsShowingDataList = false;
+        await InvokeAsync(StateHasChanged);
+
+        DataList = (await Result.Invoke(_SearchingText)).ToArray();
+
+        isSearching = false;
+        IsShowingDataList = true;
+        await InvokeAsync(StateHasChanged);
+
+    }
+
+    private string SearchText
+    {
+        get => _SearchingText;
+        set
+        {
+            _SearchingText = value;
+            if(_SearchingText.Length==0)
+            {
+                IsShowingDataList = false;
+                _timer.Stop();
+                DataList = new T[0];
+            }
+            else if(value.Length>=MinLength)
+            {
+                _timer.Stop();
+                _timer.Start();
+            }
+        }
+    }
+
+    private bool DisplayDataList()
+    {
+        return IsShowingDataList && DataList.Any();
+    }
+
+    private void showDataList()
+    {
+        if (DataList.Any())
+        {
+            IsShowingDataList = true;
+        }
+    }
+    private void hideDataList()
+    {
+        if(!IsMouseinDataList)
+        {
+            IsShowingDataList = false;
+        }
+        
+    }
+
+}

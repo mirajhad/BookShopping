@@ -1,0 +1,36 @@
+﻿@page "/author/create"
+@inject IAuthorRepo _authorRepo
+@inject NavigationManager _nav;
+@attribute [Authorize(Roles = "Admin")]
+
+
+<h3>CreateAuthor</h3>
+<div>
+    <AuthorForm Author="Author" SubmitCallBack="SaveAuthor" />
+   @*  <EditForm Model="Author" OnValidSubmit="SaveAuthor">
+        <DataAnnotationsValidator />
+        <div class="form-group mb-2">
+            <label>Author Name:</label>
+            <div>
+                <InputText class="form-control" @bind-Value="@Author.Name" />
+                <ValidationMessage For="@(()=>@Author.Name)" />
+            </div>
+
+        </div>
+       
+        <div>
+            @* <ImageComp/> 
+        </div>
+        <button class="btn btn-primary" type="submit">Submit</button>
+
+    </EditForm> *@
+</div>
+
+@code {
+    Author Author = new Author();
+    private async Task SaveAuthor()
+    {
+        await _authorRepo.PostAuthor(Author);
+        _nav.NavigateTo("/author/listauthor");
+    }
+}

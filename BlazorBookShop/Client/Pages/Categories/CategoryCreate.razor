@@ -1,0 +1,25 @@
+﻿@page "/category/create"
+@inject ICategoryRepo CategoryRepo
+@inject NavigationManager navigationManager
+@inject IUtilityService _utility
+
+<h3>Create New Category</h3>
+<CategoryForm Category="Category" SubmitCallBack="CreateCategoryMethod" />
+
+@code {
+    private Category Category = new Category();
+    private async Task CreateCategoryMethod()
+    {
+        try
+        {
+            await CategoryRepo.CreateCategory(Category);
+            await _utility.ShowSuccessMessage("Category Saved");
+            navigationManager.NavigateTo("/categories");
+        }
+        catch (Exception)
+        {
+            
+            throw;
+        }
+    }
+}

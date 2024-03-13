@@ -1,0 +1,28 @@
+﻿@page "/edit/author/{authorId:int}"
+@inject NavigationManager _nav
+@inject IAuthorRepo _authRepo
+@attribute [Authorize(Roles = "Admin")]
+
+<h3>Edit Author</h3>
+@if(author!=null)
+{
+    <AuthorForm SubmitCallBack="SubmitAuthor" Author="author"/>
+
+}
+
+
+@code {
+    [Parameter] public int authorId{ get; set; }
+    Author author;
+    protected override async Task OnInitializedAsync()
+    {
+        author = await _authRepo.GetAuthorById(authorId);
+        //  return base.OnInitializedAsync();
+    }
+    private async Task SubmitAuthor()
+    {
+        await _authRepo.UpdateAuthor(author);
+        _nav.NavigateTo("/author/listauthor");
+    }
+
+}

@@ -1,0 +1,28 @@
+﻿<div class="Book-Card">
+    <a>
+        <img src="@book.BookImage" Alt="Book Image" class="Book-Image"/>
+    </a>
+    <p><a> @book.Title</a></p>
+    <div>
+        <AuthorizeView Roles="Admin">
+            <Authorized>
+       
+        <a href="/book/edit/@book.Id" class="btn btn-info">Edit</a>
+        <button class="btn btn-info" @onclick="@(() => DeleteBook.InvokeAsync(book))">Delete</button>
+    </Authorized>
+    </AuthorizeView>
+    </div>
+</div>
+
+   
+   
+    
+
+@code {
+    [Parameter] public Book book{ get; set; }
+   // [Parameter] public bool IsShow { get; set; } = false;
+    [Parameter] public EventCallback<Book> DeleteBook{ get; set; }
+
+
+   
+}

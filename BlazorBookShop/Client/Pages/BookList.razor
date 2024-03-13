@@ -1,0 +1,11 @@
+﻿@* @page "/books" *@
+
+@* <Input type="checkbox" @onchange="@(()=>isShow=!isShow)" /> *@
+<div class="Card-Outer">
+<GenericList ListItem="bookList">
+    <ElementTemplate Context="item">
+        <BookDetails book="item"  DeleteBook="DeleteBook" />
+        </ElementTemplate>
+    </GenericList>
+</div>
+

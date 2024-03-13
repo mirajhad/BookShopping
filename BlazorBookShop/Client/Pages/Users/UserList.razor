@@ -1,0 +1,61 @@
+﻿@page "/users"
+@inject IAccountsRepository _accountRepo
+@attribute [Authorize(Roles = "Admin")]
+<h3>Users List</h3>
+<PaginationNav TotalPages="TotalPages" CurrentPage="@pageInfo.PageNumber" PageNumberSelected="SelectedPageNumber" />
+
+<GenericList ListItem="Users">
+    <CompleteListTemplate>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Email</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                @foreach (var item in Users)
+                {
+                    <tr>
+                        <td>@item.Email</td>
+                        <td>
+                            <a href="edit/user/@item.Userid" class="btn btn-primary">Edit </a>                           
+
+                        </td>
+                    </tr>
+                }
+            </tbody>
+
+        </table>
+    </CompleteListTemplate>
+</GenericList>
+<PaginationNav TotalPages="TotalPages" CurrentPage="@pageInfo.PageNumber" PageNumberSelected="SelectedPageNumber" />
+@code {
+    private List<UserDTO> Users;
+    PageInfoDTO pageInfo = new PageInfoDTO();
+    int TotalPages;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadUsers();
+        base.OnInitialized();
+    }
+    private async Task LoadUsers()
+    {
+        var response = await _accountRepo.GetAllUsers(pageInfo);
+        Users = response.Response;
+        TotalPages = response.TotalPages;
+    }
+
+    private async Task SelectedPageNumber(int pageNumber)
+    {
+        pageInfo.PageNumber = pageNumber;
+        await LoadUsers();
+
+    }
+
+
+
+    
+}

@@ -1,0 +1,50 @@
+﻿
+<h3 class="GlobalStyle">CreateCategory</h3>
+@inject ICategoryRepo _categoryRepo;
+@inject NavigationManager _nav;
+<div>
+    <EditForm Model="categories" OnValidSubmit="SaveCategory">
+        <DataAnnotationsValidator/>
+        <div class="form-group mb-2">
+            <label>Category Name:</label>
+            <div>
+                <InputText class="form-control" @bind-Value="@categories.Name"/>
+                <ValidationMessage For="@(()=>@categories.Name)"/>
+            </div>
+
+        </div>
+        @* <div class="form-group mb-2">
+        <InputSelect @bind-Value="SelectedCategory" class="form-control">
+            <option value="0">--Chhose Category</option>
+            @foreach (var item in categoryList)
+            {
+                <option value="@item.Id">@item.Name</option>
+            }
+        </InputSelect>
+        </div> *@
+        <div>
+      @* <ImageComp/> *@
+</div>
+        <button class="btn btn-primary" type="submit">Submit</button>
+
+    </EditForm>
+</div>
+@code {
+    private Category categories= new Category();
+    // private string SelectedCategory = "0";
+    // private List<Category> categoryList = new List<Category>()
+    // {
+    //     new Category{Id=1,Name="Fashion"},
+    //     new Category{Id=2,Name="Web Development"},
+
+    // };
+    private async Task SaveCategory()
+    {
+        await _categoryRepo.CreateCategory(categories);
+        _nav.NavigateTo("category/listcategory");
+
+
+
+       // Console.WriteLine($"Category Name {categories.Name} and Selected Category {SelectedCategory} is saved");
+    }
+}

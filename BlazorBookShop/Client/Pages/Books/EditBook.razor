@@ -1,0 +1,34 @@
+﻿@page "/book/edit/{bookId:int}"
+
+@attribute [Authorize(Roles = "Admin")]
+<h3>Edit  Book</h3>
+@* @if(book!=null)
+{
+    <BookForm book="book" OnValidSubmit="EditBook" UnselectedCategories="" SelectedCategories="" SelectedAuthors="" />
+} *@
+
+
+
+
+
+
+@* @if(bookId!=0)
+{
+    <span>@bookId</span>
+}
+@if(bookName!=null)
+{
+    <span>@bookName</span>
+}
+ *@
+
+@code {
+    private DetailsBookDTO book;
+    [Parameter] public int bookId{ get; set; }
+    [Parameter] public string bookName{ get; set; }
+    // protected override Task OnInitializedAsync()
+    // {
+    //     book
+    //     return base.OnInitializedAsync();
+    // }
+}

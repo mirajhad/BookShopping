@@ -1,0 +1,82 @@
+﻿@page "/author/listauthor"
+
+@inject IAuthorRepo _authorRepo
+
+<h3>ListAuthor</h3>
+<div class="form-group">
+    <a class="btn btn-primary" href="/author/create"> New Author </a>
+</div>
+<AuthorizeView>
+    <Authorized>
+       <text> User Authorized</text>@context.User.Identity.Name
+    </Authorized>
+    <NotAuthorized>
+        <text> User Not Authorized</text>
+    </NotAuthorized>
+</AuthorizeView>
+
+<PaginationNav TotalPages="TotalPages" CurrentPage="@pageInfo.PageNumber" PageNumberSelected="SelectedPageNumber" />
+
+<GenericList ListItem="Authors">
+    <CompleteListTemplate>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                @foreach (var item in Authors)
+                {
+                    <tr>
+                        <td>@item.Name</td>
+                        <td>
+                            <a href="edit/author/@item.Id" class="btn btn-primary">Edit </a>
+
+                            <button @onclick="@(()=>DeleteAuthor(item.Id))" class="btn btn-danger">Delete</button>
+
+                        </td>
+                    </tr>
+                }
+            </tbody>
+
+        </table>
+    </CompleteListTemplate>
+</GenericList>
+<PaginationNav TotalPages="TotalPages" CurrentPage="@pageInfo.PageNumber" PageNumberSelected="SelectedPageNumber" />
+
+@code {
+    private List<Author> Authors;
+    PageInfoDTO pageInfo = new PageInfoDTO();
+    int TotalPages;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadAuthor();   
+        base.OnInitialized();
+    }
+    private async Task LoadAuthor()
+    {
+        var response = await _authorRepo.GetAllAuthors(pageInfo);
+        Authors = response.Response;
+        TotalPages = response.TotalPages;
+    }
+
+    private async Task SelectedPageNumber(int pageNumber)
+    {
+        pageInfo.PageNumber = pageNumber;
+        await LoadAuthor();
+
+    }
+
+
+
+    private async Task DeleteAuthor(int id)
+    {
+        await _authorRepo.DeleteAuthor(id);
+        await LoadAuthor();
+    }
+
+}

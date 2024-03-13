@@ -1,0 +1,25 @@
+﻿@page "/category/edit/{categoryId:int}"
+@inject ICategoryRepo CategoryRepo
+@inject NavigationManager navigationManager
+@if(category!=null)
+{
+    <CategoryForm Category="category" SubmitCallBack="EditCategoryMethod" />
+}
+
+<h3>CategoryEdit</h3>
+
+@code {
+    [Parameter] public int categoryId{ get; set; }
+    public Category category;
+    protected override async Task OnInitializedAsync()
+    {
+        category = await CategoryRepo.GetCategory(categoryId);
+        // return base.OnInitializedAsync();
+    }
+    private async Task EditCategoryMethod()
+    {
+        await  CategoryRepo.UpdateCategory(category);
+        navigationManager.NavigateTo("/categories");
+
+    }
+}

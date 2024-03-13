@@ -1,0 +1,29 @@
+﻿@page "/"
+@page "/index"
+@inject IBookRepository _bookRepo
+
+
+<BookList bookList="bookList"/>
+
+ 
+
+@code{
+
+
+    List<Book> bookList= new List<Book>();
+    protected async override Task OnInitializedAsync()
+    {
+       
+        bookList = await _bookRepo.GetAllBooks();
+      
+    }
+
+
+   
+
+
+
+
+
+    
+}

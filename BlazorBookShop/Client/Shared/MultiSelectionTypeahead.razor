@@ -1,0 +1,36 @@
+﻿@typeparam T
+<CustomTypeahead Result="@((string searchText)=> Searching(searchText))" SendValue="@((T item)=> SelectedItem(item))">
+<ResultTemplate>
+    @MultiSelectionResultTemplate(context)
+</ResultTemplate>   
+</CustomTypeahead>
+<ul class="list-group">
+    @foreach (var item in SelectedItems)
+    {
+        <li class="list-group-item list-group-item-action">
+            @ListResultTemplate(item)
+            <span @onclick="@(()=>SelectedItems.Remove(item))" class="badge badge-primary badge-pill"
+                style="cursor:pointer;color:black">x</span>
+        </li>
+    }
+
+</ul>
+
+@code {
+    [Parameter] public List<T> SelectedItems { get; set; } = new List<T>();
+    [Parameter] public RenderFragment<T> MultiSelectionResultTemplate{ get; set; }
+    [Parameter] public RenderFragment<T> ListResultTemplate{ get; set; }
+
+    [Parameter] public Func<string,Task<IEnumerable<T>>> Searching{ get; set; }
+    private void SelectedItem(T item)
+    {
+        if(!SelectedItems.Any(x => x.Equals(item)))
+        {
+            SelectedItems.Add(item); 
+        }
+        }
+
+
+
+
+}

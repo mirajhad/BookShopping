@@ -1,0 +1,68 @@
+﻿
+<nav aria-label="...">
+    <ul class="pagination justify-content-end">
+        @foreach (var item in NavigationList)
+        {
+            <li style="cursor:pointer" @onclick="@(()=>SelectPageMethod(item))" class="page-item @(item.Enabled?null:"disabled") @(item.IsActive?"active":null)" >
+                <span class="page-link" href="#">@item.Text</span>
+            </li>
+
+        }
+    </ul>
+</nav>
+
+@code {
+    [Parameter] public int CurrentPage { get; set; } = 1;
+    [Parameter] public int TotalPages { get; set; }
+    [Parameter] public int Radius { get; set; } = 3;
+    [Parameter] public EventCallback<int> PageNumberSelected{ get; set; }
+
+
+    List<NavigationItem> NavigationList;
+
+    private async Task SelectPageMethod(NavigationItem item)
+    {
+        if(item.PageNumber==CurrentPage)
+        {
+            return;
+        }
+        if(!item.Enabled)
+        {
+            return;
+        }
+        CurrentPage = item.PageNumber;
+        await PageNumberSelected.InvokeAsync(item.PageNumber);
+
+    }
+
+    protected override void OnParametersSet()
+    {
+        NavigationList = new List<NavigationItem>();
+        LoadComponent();
+        base.OnParametersSet();
+    }
+
+    private void LoadComponent()
+    {
+        var isPrevious = CurrentPage != 1;
+        var previousPage = CurrentPage - 1;
+        NavigationList.Add(new NavigationItem("Previous", previousPage, isPrevious));
+        for (int i = 1; i <= TotalPages; i++)
+        {
+
+            if(i>=CurrentPage-Radius && i<=CurrentPage+Radius)
+            {
+                NavigationList.Add(new NavigationItem(i) { IsActive = CurrentPage == i });
+
+            }
+
+        }
+        var isNext = CurrentPage != TotalPages;
+        var nextPage = CurrentPage + 1;
+        NavigationList.Add(new NavigationItem("Next", nextPage, isNext));
+
+    }
+   
+
+}
+

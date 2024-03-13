@@ -1,0 +1,18 @@
+﻿<div>
+    <a href="">
+        <img src="@Book.BookImage" alt="Book Image"/>
+    </a>
+    <p>@Book.BookDescription</p>
+    <div>
+        
+   <a class="btn btn-primary" href="/book/edit/@Book.Id">Edit</a>
+        <button class="btn btn-danger" @onclick="@(()=>DeleteBook.InvokeAsync(Book))">Delete</button>
+           
+    </div>
+</div>
+
+@code {
+    [Parameter] public Book Book { get; set; }
+    [Parameter] public EventCallback<Book> DeleteBook{ get; set; }
+
+}

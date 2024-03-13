@@ -1,0 +1,26 @@
+﻿@page "/books"
+@inject IJSRuntime js
+@inject IBookRepository bookRepo
+
+<h3>Books</h3>
+<GenericList ListItem="Books">
+    <ElementTemplate Context="book">
+        <SingleBookDetails Book="book" DeleteBook="DeleteMethod" />
+
+    </ElementTemplate>
+</GenericList>
+
+
+
+@code {
+    [Parameter] public List<Book> Books{ get; set; }
+    private async Task DeleteMethod(Book book)
+    {
+        bool confirm = await js.Confirm($"Areyou sure you want to delete {book.Title}");
+        if(confirm)
+        {
+            await bookRepo.DeleteBook(book.Id);
+            Books.Remove(book);
+        }
+    }
+}

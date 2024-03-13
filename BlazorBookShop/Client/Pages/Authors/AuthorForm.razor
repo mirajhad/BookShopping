@@ -1,0 +1,49 @@
+﻿<EditForm Model="Author" OnValidSubmit="SubmitCallBack">
+    <DataAnnotationsValidator />
+    <div class="form-group">
+        <label>Author Name:</label>
+        <div>
+            <InputText class="form-control" @bind-Value="@Author.Name" />
+            <ValidationMessage For="@(()=> Author.Name )" />
+        </div>
+    </div>
+    <div class="form-group">
+        <label>Author Bio:</label>
+        <div>
+            <InputText class="form-control" @bind-Value="@Author.AuthorBio" />
+            <ValidationMessage For="@(()=> Author.AuthorBio )" />
+        </div>
+    </div>
+    <div class="form-group">
+        <label>Author Image:</label>
+        <div>
+            <ImageComp ImageUrl="@authorImage" SendImageUrl="SaveImageMethod" />
+        </div>
+    </div>
+    <button class="btn btn-primary" type="submit">Save Changes</button>
+</EditForm>
+
+@code {
+    [Parameter] public Author Author { get; set; }
+    string authorImage;
+    protected override void OnInitialized()
+    {
+        if(!string.IsNullOrEmpty(Author.AuthorImage))
+        {
+            authorImage =  Author.AuthorImage;
+            Author.AuthorImage = null;
+
+        }
+        base.OnInitialized();
+    }
+
+    public async Task SaveImageMethod(string image)
+    {
+        Author.AuthorImage = image;
+        authorImage = null;
+
+
+    }
+    [Parameter]
+    public EventCallback SubmitCallBack { get; set; }
+}

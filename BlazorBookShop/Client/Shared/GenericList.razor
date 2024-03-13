@@ -1,0 +1,62 @@
+﻿@typeparam T
+ @if (ListItem == null)
+{
+@if (NullTemplate != null)
+{
+    @NullTemplate
+    
+}
+else
+{
+
+        <img src="https://i.pinimg.com/originals/c7/e1/b7/c7e1b7b5753737039e1bdbda578132b8.gif" />
+}
+
+
+}
+else if (ListItem.Count == 0)
+{
+@if (EmptyTemplate != null)
+{
+    @ElementTemplate
+   
+}
+else
+{
+
+   <text>There are no record</text>
+}
+
+}
+else{
+    @if (ElementTemplate != null)
+{
+    
+
+        @foreach (var item in ListItem)
+        {
+            @ElementTemplate(item)
+            
+        }
+       @*  @for (int i = 0; i < bookList.Count; i++)
+        {
+            <p><b>@((i + 1)) @bookList[i].Title</b></p>
+        } *@
+
+    }
+    else
+    {
+        @CompleteListTemplate
+    }
+}
+
+
+@code {
+    [Parameter] public RenderFragment NullTemplate { get; set; }
+    [Parameter] public RenderFragment CompleteListTemplate { get; set; }
+    [Parameter] public RenderFragment<T> ElementTemplate { get; set; }   
+    [Parameter] public RenderFragment EmptyTemplate { get; set; }
+    [Parameter] public List<T> ListItem { get; set; }
+
+
+}

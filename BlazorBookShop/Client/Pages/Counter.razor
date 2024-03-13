@@ -1,0 +1,38 @@
+﻿@page "/counter"
+
+<PageTitle>Counter</PageTitle>
+
+<h1>Counter</h1>
+
+<p role="status">Current count: @currentCount</p>
+
+<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+<BookList bookList="bookList" />
+
+@code {
+
+    List<Book> bookList;
+    protected async override Task OnInitializedAsync()
+    {
+        await Task.Delay(3000);
+        bookList = new List<Book>()
+ {
+     new Book{Id=1,Title="Ecommerce App With ASP.NET CORE Counter"},
+     new Book{Id=2,Title="Ecommerce App With ASP.NET MVC Counter"},
+     new Book{Id=3,Title="Ecommerce App With PHP Counter"},
+
+ };
+        base.OnInitialized();
+    }
+
+
+
+
+
+    private int currentCount = 0;
+
+    private void IncrementCount()
+    {
+        currentCount++;
+    }
+}

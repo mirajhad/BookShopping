@@ -1,0 +1,24 @@
+﻿@page "/book/create"
+@inject NavigationManager navigation
+@inject ICategoryRepo _categoryRepo
+@inject IBookRepository _bookRepo
+@attribute [Authorize(Roles ="Admin")]
+<h3>Create New Book</h3>
+@if(UnSelectedCategories!=null)
+{
+    <BookForm book="book" UnselectedCategories="UnSelectedCategories" OnValidSubmit="SaveBook" />
+}
+@code {
+    List<Category> UnSelectedCategories;
+    private Book book = new Book();
+    protected async override Task OnInitializedAsync()
+    {
+        UnSelectedCategories = await _categoryRepo.GetAllCategories();
+        base.OnInitialized();
+    }
+    public async Task SaveBook()
+    {
+        int bookId = await _bookRepo.CreateBook(book);
+        navigation.NavigateTo("books");
+    }
+}

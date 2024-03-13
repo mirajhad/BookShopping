@@ -1,0 +1,73 @@
+﻿@page "/categories"
+@inject ICategoryRepo categoryRepo
+@attribute [Authorize(Roles ="Admin")]
+<h3>Categories</h3>
+
+<div class="form-group">
+    <a class="btn btn-primary" href="category/create"> New Category </a>
+</div>
+<GenericList ListItem="categories">
+    <CompleteListTemplate>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+
+        @foreach (var item in categories)
+        {
+            <tr>
+                <td>@item.Name</td>
+                <td>
+                    <a href="category/edit/@item.Id" class="btn btn-primary">Edit </a>
+
+                    <button @onclick="@(()=>DeleteCategory(item.Id))" class="btn btn-danger">Delete</button>
+
+                </td>
+            </tr>
+        }
+    </tbody>
+
+</table>
+    </CompleteListTemplate>
+</GenericList>
+
+
+@code {
+    public List<Category> categories;
+   // [CascadingParameter] private Task<AuthenticationState> AuthState{ get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            // var authState = await AuthState;
+            // var user = authState.User;
+            // if(user.Identity.IsAuthenticated)
+            // {
+                categories = await categoryRepo.GetAllCategories();
+            // }
+
+            
+
+        }
+        catch (Exception)
+        {
+
+            throw;
+        }
+
+    }
+    private async Task DeleteCategory(int Id)
+    {
+        await categoryRepo.DeleteCategory(Id);
+        categories = await categoryRepo.GetAllCategories();
+
+    }
+
+}
+

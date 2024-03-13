@@ -1,0 +1,103 @@
+﻿@inject IAuthorRepo authorRepo
+<h3>BookForm</h3>
+<EditForm Model="book" OnValidSubmit="ValidateSubmit">
+    <DataAnnotationsValidator/>
+    <div class="form-group">
+        <label>Book Title:</label>
+        <div>
+            <InputText class="form-control" @bind-Value="book.Title"/>
+            <ValidationMessage For="@(()=>book.Title)"/>
+        </div>
+    </div>
+    <div class="form-group">
+        <label>Book Description:</label>
+        <div>
+            <InputTextArea class="form-control" @bind-Value="book.BookDescription" />
+            
+        </div>
+    </div>
+    <div class="form-group mb-3">
+        <label>Book ISBN:</label>
+        <div>
+            <InputText class="form-control" @bind-Value="book.BookISBN" />
+            <ValidationMessage For="@(()=>book.BookISBN)" />
+        </div>
+    </div>
+    <div class="form-group mb-3">
+       
+        <div>
+            <ImageComp ImageUrl="@bookImage" SendImageUrl="SaveImageMethod" />
+        </div>
+    </div>
+    <div class="form-group">
+        <MultipleSection SelectedList="SelectedList" unSelectedList="unSelectedList" />
+    </div>
+    <div class="form-group mb-5">
+        <label>Select Author</label>
+        <MultiSelectionTypeahead Context="author" Searching="SearchMethod" SelectedItems="SelectedAuthors">
+            <MultiSelectionResultTemplate>
+                <img style="width:30px;height:30px" src="@author.AuthorImage"/>
+                @author.Name
+            </MultiSelectionResultTemplate>
+            <ListResultTemplate>
+          @author.Name
+            </ListResultTemplate>
+        </MultiSelectionTypeahead>
+    </div>
+    <button type="submit" class="btn btn-primary">Save Changes</button>
+
+</EditForm>
+
+@code {
+    [Parameter] public Book book{ get; set; }
+    string bookImage;
+
+    [Parameter] public List<Category> SelectedCategories { get; set; } = new List<Category>();
+    [Parameter] public List<Category> UnselectedCategories { get; set; } = new List<Category>();
+
+    private List<SelectMultiple> unSelectedList { get; set; } = new List<SelectMultiple>();
+    private List<SelectMultiple> SelectedList { get; set; } = new List<SelectMultiple>();
+    [Parameter]
+    public List<Author> SelectedAuthors { get; set; } = new List<Author>();
+    [Parameter] public EventCallback OnValidSubmit{ get; set; }
+
+    protected override void OnInitialized()
+    {
+        unSelectedList = UnselectedCategories.Select(x => new SelectMultiple(x.Id.ToString(), x.Name)).ToList();
+        SelectedList = SelectedCategories.Select(x => new SelectMultiple(x.Id.ToString(), x.Name)).ToList();
+
+        if (!string.IsNullOrEmpty(book.BookImage))
+        {
+            bookImage = book.BookImage;
+            book.BookImage = null;
+
+        }
+        base.OnInitialized();
+    }
+
+    public async Task SaveImageMethod(string image)
+    {
+        book.BookImage = image;
+        bookImage = null;
+
+
+    }
+
+    private async Task<IEnumerable<Author>> SearchMethod(string searchText)
+    {
+        return await authorRepo.SearchAuthor(searchText);
+    }
+    private async Task ValidateSubmit()
+    {
+        book.BookCategories = SelectedList.Select(x => new BookCategory { CategoryId = int.Parse(x.Key) }).ToList();
+        book.BookAuthors = SelectedAuthors.Select(x => new BookAuthor { AuthorId = x.Id }).ToList();
+        if(!string.IsNullOrWhiteSpace(book.BookImage)){ bookImage = null; }
+        await OnValidSubmit.InvokeAsync(null);
+
+
+
+
+
+    }
+
+}
